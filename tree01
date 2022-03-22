@@ -1,0 +1,69 @@
+#include<iostream>
+#include<algorithm>
+#include<cstring>
+
+using namespace std;
+
+class Treenode
+{
+    public:
+    int val;
+    Treenode *left = NULL;
+    Treenode *right = NULL;
+    Treenode(int x) : val(x) , left(NULL), right(NULL){}
+};
+
+class tree
+{
+    public:
+    Treenode *root;
+    ~tree();
+
+    void ctree(int a)
+    {
+        root = (Treenode*)malloc(sizeof (Treenode));
+        root->val = a;
+    }
+
+    void addl(Treenode *&tar , int a)
+    {
+        tar->left = (Treenode*)malloc(sizeof (Treenode));
+        tar->left->val = a;
+        tar->left->left = NULL; 
+        tar->left->right = NULL;
+    }
+
+    void addr(Treenode *&tar, int b)
+    {
+        tar->right = (Treenode*)malloc(sizeof (Treenode));
+        tar->right->val = b;
+        tar->right->left = NULL; 
+        tar->right->right = NULL;
+    }
+
+    void prearray(Treenode *&root)
+    {
+        if (root == NULL)
+            return ; 
+        cout<<root->val<<' ';
+        prearray(root->left);
+        prearray(root->right);
+    }
+};
+
+tree::~tree()
+{
+    printf("\nTree has been destoryed !");
+}
+
+int main()
+{
+    tree t1;
+    t1.ctree(5);
+    t1.addl(t1.root,10);
+    t1.addl(t1.root->left,16);
+    t1.addr(t1.root->left,-2);
+    t1.addr(t1.root,-1);
+    t1.prearray(t1.root);
+    return 0;
+}
