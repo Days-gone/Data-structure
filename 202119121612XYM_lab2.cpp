@@ -50,8 +50,8 @@ class list
 
     void remove(node* pre)
     {
-        printf("----Will remove student next to num %d----\n",pre->num);
         node* tem = pre->next;
+        printf("前面是%d----\n",pre->num);
         pre->next = pre->next->next;
         free(tem);
         length--;
@@ -69,7 +69,7 @@ class list
 
     node* findstr(string a)
     {
-        printf("----The number or name you want to find :----\n\t");
+        printf("----所求值是 :----\n\t");
         node* p = head->next;
         while(p || p->next)
         {
@@ -86,7 +86,7 @@ class list
 
     void display()
     {
-        printf("----Display as follows:----\n");
+        printf("----展示如下:----\n");
         node* p = head->next;
         while(p)
         {
@@ -97,7 +97,7 @@ class list
 
     void showL()
     {
-        printf("----The length is %d ----\n");
+        printf("----此时链表长度为 %d ----\n",length);
     }
 
     void destory()
@@ -112,12 +112,12 @@ class list
             p = tem;
             if (p)tem = p->next;
         }
-        printf("----List has been destoryed----\n");
+        printf("----链表已经摧毁----\n");
     }
 
     node* findval(double price)
     {
-        printf("----The value you want to find :----\n\t");
+        printf("----所求值为----\n\t");
         node* p = head->next;
         while(p || p->next)
         {
@@ -140,65 +140,91 @@ int main()
     double price;
 
     fstream a;
-    a.open("data.txt",ios::in | ios::app);
+    
+    a.open("student.txt",ios::in | ios::app);
 
     list l1;
-    l1.create();
-    while(a>>num>>name>>price)
-    {
-        l1.hadd(num,name,price);
-    }
 
-    printf("----FILE IN FINISHED----\n");
-    printf("----OP----\n");
-    printf("1.add\n2.remove\n3.display\n4.find by name or num\n5.find by value\n6.destory\n7.end");
-    printf("\n----OP----\n");
+    cout<<"202119121612徐一鸣\n";
+    cout<<"---------------------\n";
+	cout << "1. 初使化链表\n"; 
+    cout<<"2. 前插法构建链表\n";
+    cout<<"3. 后插法构建链表\n";
+    cout<<"4. 显示链表长度\n";
+    cout<<"5. 显示链表内容\n";
+    cout<<"6. 查找学生信息\n";
+    cout<<"7. 获取学生信息\n";
+    cout<<"8. 插入学生信息\n";
+    cout<<"9. 删除学生信息\n";
+    cout<<"10. 销毁链表\n";
+    cout<<"0.退出\n";
+    cout<<"请选择:\n";
+
+    //printf("1.add\n2.remove\n3.display\n4.find by name or num\n5.find by value\n6.destory\n7.end");
+    // printf("\n----OP----\n");
     while(cin>>op)
     {
-        if (op == "1")
+        if (op == "1" )
+        {
+            l1.create();
+        }
+
+        if (op == "2" || op == "3")
+        {
+            while(a>>num>>name>>price)
+            {
+                l1.hadd(num,name,price);
+            }
+        }
+
+        if (op == "4")l1.showL();
+
+        if (op == "8")
         {
             string pre;
-            printf("SHOW THE INFO OF THE PRE\n");
+            printf("展示前驱\n");
             cin>>pre;
             printf("THE INFO YOU WANT TO ADD\n");
             cin>>num>>name>>price;
             l1.add(l1.findstr(pre),num,name,price);
             printf("----FINISHED----\n");
         }
-        else if (op == "2")
+        if (op == "9")
         {
             string pre;
-            printf("SHOW THE INFO OF THE PRE\n");
+            printf("展示前驱\n");
             cin>>pre;
             l1.remove(l1.findstr(pre));
             printf("----FINISHED----\n");
         }
-        else if (op == "3")
+        if (op == "5")
         {
             l1.display();
             printf("----FINISHED----\n");
         }
-        else if (op == "4")
+        if (op == "6")
         {
             string tar;
             cin>>tar;
             l1.findstr(tar);
             printf("----FINISHED----\n");
         }
-        else if (op == "5")
+        if (op == "7")
         {
             cin>>price;
             l1.findval(price);
             printf("----FINISHED----\n");
         }
-        else if (op == "6")
+
+        if (op == "10")
         {
             l1.destory();
             printf("----FINISHED----\n");
         }
-        else 
+
+        if (op == "0")
         {
-            printf("THANK YOU FOR YOUR USING !\n");
+            printf("已退出!\n");
             break;
         }
     }
