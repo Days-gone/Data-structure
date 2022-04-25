@@ -1,0 +1,99 @@
+//栈的标准操作
+Status InitStack(LinkStack &S);
+bool StackEmpty(LinkStack S);
+Status Push(LinkStack &S, SElemType e);
+Status Pop(LinkStack &S, SElemType &e);
+SElemType GetTop(LinkStack &S);
+
+bool In(char ch);
+char Precede(char theta1, char theta2);
+char Operate(char first, char theta, char second);
+char EvaluateExpression(char *);
+
+#include <iostream>
+#define OK 1
+#define ERROR 0
+#define OVERFLOW -2
+
+using namespace std;
+
+const char oper[7] = {'+', '-', '*', '/', '(', ')', '#'};
+
+typedef char SElemType;
+
+typedef int Status;
+
+typedef struct StackNode
+{
+    int data;
+    struct StackNode *next;
+} StackNode, *LinkStack;
+
+
+Status InitStack(LinkStack &S)
+{
+    *LinkStack = new (StackNode);
+}
+bool StackEmpty(LinkStack S);
+Status Push(LinkStack &S, SElemType e);
+Status Pop(LinkStack &S, SElemType &e);
+SElemType GetTop(LinkStack &S);
+
+
+
+
+
+char Precede(char theta1, char theta2)
+{
+    if (theta1 == '+' || theta1 == '-' && 
+    (theta2 == '*' || theta2 == '/' || theta2 == '('))return '<';
+    if (theta1 == '+' || theta1 == '-' && 
+    (theta2 == '+' || theta2 == '-' || theta2 == ')' || theta2 == '#'))return '>';
+    if (theta1 == '*' || theta1 == '/' && theta2 != '(')return '>';
+    if (theta1 == '*' || theta1 == '/' && theta2 == '(')return '<';
+    if (theta1 == '('  && theta2 != ')')return '<';
+    if (theta1 == ')')return '>';
+    if (theta1 == '#' && theta2 != '#')return '<';
+    if (theta1 == '#' && theta2 == '#')return '=';
+
+
+}
+
+char Operate(char first, char theta, char second)
+{
+    if (theta == '+')return (first-'0' + second -'0')+'0';
+    if (theta == '-')return (first-'0' - second +'0')+'0';
+    if (theta == '*')return ((first-'0') * (second -'0'))+'0';
+    if (theta == '/')return ((first-'0') / (second -'0'))+'0';
+}
+
+char EvaluateExpression(char *)
+{
+    InitStack(OPND);
+}
+
+bool in(char ch)
+{
+    for(int i = 0;i < 7;i ++)
+        if (ch == oper[i])return true;
+    return false;
+}
+
+
+int main()
+{
+    int mode;
+    cin >> mode;
+    char chs[80];
+    bool TestOther(int);
+    switch (mode)
+    {
+        case 4:
+            cin >> chs;
+            cout << EvaluateExpression(chs) - 48 << endl;
+            break;
+        default:
+            TestOther(mode);
+    }
+    return 0;
+}
