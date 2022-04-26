@@ -1,3 +1,11 @@
+#include <iostream>
+#define OK 1
+#define ERROR 0
+#define OVERFLOW -2
+
+using namespace std;
+
+
 //栈的标准操作
 Status InitStack(LinkStack &S);
 bool StackEmpty(LinkStack S);
@@ -10,12 +18,6 @@ char Precede(char theta1, char theta2);
 char Operate(char first, char theta, char second);
 char EvaluateExpression(char *);
 
-#include <iostream>
-#define OK 1
-#define ERROR 0
-#define OVERFLOW -2
-
-using namespace std;
 
 const char oper[7] = {'+', '-', '*', '/', '(', ')', '#'};
 
@@ -29,18 +31,40 @@ typedef struct StackNode
     struct StackNode *next;
 } StackNode, *LinkStack;
 
-
 Status InitStack(LinkStack &S)
 {
-    *LinkStack = new (StackNode);
+    S->next = NULL;
 }
-bool StackEmpty(LinkStack S);
-Status Push(LinkStack &S, SElemType e);
-Status Pop(LinkStack &S, SElemType &e);
-SElemType GetTop(LinkStack &S);
 
+bool StackEmpty(LinkStack S)
+{
+    if (S->next == NULL)return true;
+    else return false;
+}
 
+Status Push(LinkStack &S, SElemType e)
+{
+    StackNode tem = new StackNode;
+    tem->data = e;
+    tem->next = S->next;
+    S->next = tem;
+}
 
+Status Pop(LinkStack &S, SElemType &e)
+{
+    if (!StackEmpty(S))
+    {
+        e = S->data ;
+        S->next = S->next->next;
+        return 1;
+    }
+    else return 0;
+}
+
+SElemType GetTop(LinkStack &S)
+{
+    return S->data;
+}
 
 
 char Precede(char theta1, char theta2)
@@ -69,7 +93,34 @@ char Operate(char first, char theta, char second)
 
 char EvaluateExpression(char *)
 {
-    InitStack(OPND);
+    LinkStack opnd = new (StackNode);
+    LinkStack optr = new (StackNode);
+    InitStack(opnd);
+    InitStack(optr);
+    Push(optr,'#');
+    cin>>ch;
+    while(ch != '#' && GetTop(optr) != '#')
+    {
+        if (!In(CH)){Push(opnd,ch);cin>>ch;}
+        else 
+        {
+            switch(Precede(GetTop(optr),ch))
+            {
+                case '<':
+                Push(optr,ch);cin>>ch;
+                break;
+                case '>':
+                Pop(optr,theta);
+                Pop(opnd,b);Pop(opnd,a);
+                Push(opnd,Operate(a,theta,b));
+                break;
+                case '=':
+                Pop(optr,x);cin>>ch;
+                break;
+            }
+        }
+    }
+    return GetTop(opnd);
 }
 
 bool in(char ch)
@@ -78,7 +129,6 @@ bool in(char ch)
         if (ch == oper[i])return true;
     return false;
 }
-
 
 int main()
 {
