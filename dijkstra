@@ -1,0 +1,157 @@
+#include <iostream>
+#include <fstream>
+using namespace std;
+#define ERROR 0
+#define MaxInt 32767     //表示极大值，即∞
+#define MVNum 100        //最大顶点数
+typedef char VerTexType; //假设顶点的数据类型为字符型
+typedef int ArcType;     //假设边的权值类型为整型
+int *D = new int[MVNum];
+bool *S = new bool[MVNum];  //标记顶点是否进入 S 集合
+int *Path = new int[MVNum]; //用于记录最短路顶点的前驱
+
+typedef struct
+{
+    VerTexType vexs[MVNum];     //顶点表
+    ArcType arcs[MVNum][MVNum]; //邻接矩阵
+    int vexnum, arcnum;         //有向网的当前点数和边数
+} AMGraph;
+
+void DisplayPath(AMGraph G, int begin, int temp)
+{
+    if (Path[temp] != -1)
+    {
+        DisplayPath(G, begin, Path[temp]);
+        cout << G.vexs[Path[temp]] << "-->";
+    }
+}
+
+int LocateVex(AMGraph G, VerTexType v)
+{
+    for (int i = 0; i < G.vexnum; ++i)
+        if (G.vexs[i] == v)
+            return i;
+    return -1;
+}
+
+void DisplayG(AMGraph G)
+{
+    int i, j;
+    for (i = 0; i < G.vexnum; ++i)
+    {
+        for (j = 0; j < G.vexnum; ++j)
+        {
+            if (j != G.vexnum - 1)
+            {
+                if (G.arcs[i][j] != MaxInt)
+                    cout << G.arcs[i][j] << "\t";
+                else
+                    cout << "∞"
+                         << "\t";
+            }
+            else
+            {
+                if (G.arcs[i][j] != MaxInt)
+                    cout << G.arcs[i][j] << endl;
+                else
+                    cout << "∞" << endl;
+            }
+        }
+    }
+}
+
+void dijkstra(AMGraph G , int vo)
+{
+    int n = G .vexnum;
+    for(int v = 0 ;v < n ;v ++)
+    {
+        S[v] = false;
+        D[v] = G.arcs[vo][v];
+        if (D[v] < MaxInt)Path[v] = vo;
+        else Path[v] = -1;
+    }
+    S[vo] = true;
+    D[vo] = 0;
+
+    for(int i = 1;i < n;i ++)
+    {
+        int min = MaxInt;
+        int v;
+        for(int w = 0 ;w < n; w++)
+            if (!S[w] && D[w] < min)
+            {
+                v = w;
+                min = D[w];
+            }
+        S[v] = true;
+        for(int w = 0 ;w < n;w ++)
+        {
+            if (!S[w] && (D[v] + G.arcs[v][w] < D[w]))
+            {
+                D[w] = D[v] + G.arcs[v][w];
+                Path[w] = v;
+            }
+        }
+    }
+}
+
+void CreateUDN(AMGraph &G)
+{
+    int i, j, k;
+    fstream file;
+    file.open("data.txt"); //该文件内容根据程序读写过程自己输入
+    if (!file)
+    {
+        cout << "未找到相关文件，无法打开！" << endl;
+        exit(ERROR);
+    }
+    file >> G.vexnum >> G.arcnum;
+    for (i = 0; i < G.vexnum; ++i)
+        file >> G.vexs[i];
+    //初始化邻接矩阵，边的权值均置为极大值 MaxInt
+    for (i = 0; i < G.vexnum; ++i)
+        for (j = 0; j < G.vexnum; ++j)
+            G.arcs[i][j] = MaxInt;
+    //构造邻接矩阵
+    for (k = 0; k < G.arcnum; ++k)
+    {
+        VerTexType v1, v2;
+        ArcType w;
+        file >> v1 >> v2 >> w; //输入一条边依附的顶点及权值
+
+        int i  = LocateVex(G,v1);
+        int j  = LocateVex(G,v2);
+        G.arcs[i][j] = w;
+        G.arcs[j][i] = w;
+    }
+    file.close();
+}
+
+int main()
+{
+    cout<<"徐一鸣 202119121612 实验5"<<endl;
+    cout << "************算法 6.10 迪杰斯特拉算法*************" << endl
+         << endl;
+    AMGraph G;
+    int i, j, num_start, num_destination;
+    VerTexType start, destination;
+    cout << "从文件中读入有向网 G 数据*****" << endl;
+    CreateUDN(G);; //补充语句，创建有向网
+    cout << endl;
+    cout << "*****有向网 G 创建完成！*****" << endl;
+    DisplayG(G);
+    cout << endl;
+    cout << "请依次输入起始点、终点名称：";
+    cin >> start >> destination;
+    //计算起点与终点编号
+    num_start = LocateVex(G, start);
+    num_destination = LocateVex(G, destination);
+    dijkstra(G,num_start);//补充语句，调用函数求最短路径
+    //显示最短路径
+    cout << endl
+         << "最短路径为：";
+    DisplayPath(G, num_start, num_destination);
+    cout << G.vexs[num_destination] << endl;
+    system("pause");
+    return 0;
+}
