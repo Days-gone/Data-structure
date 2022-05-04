@@ -1,0 +1,152 @@
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+#define ERROR 0
+#define OK 1
+#define MVNum 100
+#define MaxInt 32767
+
+typedef char VerTexType; //假设顶点的数据类型为字符型
+typedef int ArcType;     //假设边的权值类型为整型
+
+typedef struct
+{
+    VerTexType vexs[MVNum];     //顶点表
+    ArcType arcs[MVNum][MVNum]; //邻接矩阵
+    int vexnum, arcnum;         //无向网的当前点数和边数
+} AMGraph;
+
+struct
+{
+    VerTexType adjvex; //最小边在 U 中的顶点
+    ArcType lowcost;   //最小边上的权值
+} closedge[MVNum];
+
+int Min(AMGraph G)
+{
+    int i;
+    int index = -1;
+    int min = MaxInt;
+    for (i = 0; i < G.vexnum; ++i)
+    {
+        if (min > closedge[i].lowcost && closedge[i].lowcost != 0)
+        {
+            min = closedge[i].lowcost;
+            index = i;
+        }
+    }
+    return index;
+}
+
+int LocateVex(AMGraph G, VerTexType v)
+{
+    for (int i = 0; i < G.vexnum; ++i)
+        if (G.vexs[i] == v)
+            return i;
+    return -1;
+}
+
+void CreateUDN(AMGraph &G)
+{
+    int i, j, k;
+    fstream file;
+    file.open("data.txt"); //该文件内容根据程序读写过程自己输入
+    if (!file)
+    {
+        cout << "未找到相关文件，无法打开！" << endl;
+        exit(ERROR);
+    }
+    file >> G.vexnum >> G.arcnum;
+    for (i = 0; i < G.vexnum; ++i)
+        file >> G.vexs[i];
+    //初始化邻接矩阵，边的权值均置为极大值 MaxInt
+    for (i = 0; i < G.vexnum; ++i)
+        for (j = 0; j < G.vexnum; ++j)
+            G.arcs[i][j] = MaxInt;
+    //构造邻接矩阵
+    for (k = 0; k < G.arcnum; ++k)
+    {
+        VerTexType v1, v2;
+        ArcType w;
+        file >> v1 >> v2 >> w; //输入一条边依附的顶点及权值
+
+        int i  = LocateVex(G,v1);
+        int j  = LocateVex(G,v2);
+        G.arcs[i][j] = w;
+        G.arcs[j][i] = w;
+    }
+    file.close();
+}
+
+void DisplayG(AMGraph G)
+{
+    int i, j;
+    for (i = 0; i < G.vexnum; ++i)
+    {
+        for (j = 0; j < G.vexnum; ++j)
+        {
+            if (j != G.vexnum - 1)
+            {
+                if (G.arcs[i][j] != MaxInt)
+                    cout << G.arcs[i][j] << "\t";
+                else
+                    cout << "∞"
+                         << "\t";
+            }
+            else
+            {
+                if (G.arcs[i][j] != MaxInt)
+                    cout << G.arcs[i][j] << endl;
+                else
+                    cout << "∞" << endl;
+            }
+        }
+    }
+}
+
+void MiniSpanTree_Prim(AMGraph G, VerTexType v)
+{
+    int k = LocateVex(G,v);
+    for(int j = 0;j < G.vexnum;j ++)
+        if (j != k)closedge[j] = {v,G.arcs[k][j]};
+    closedge[k].lowcost = 0;
+    for(int i = 1; i < G.vexnum ; i ++)
+    {
+        k = Min(G);
+        int uo = closedge[k].adjvex;
+        int vo = G.vexs[k];
+        printf("%c %c ",uo,vo);
+        closedge[k].lowcost = 0;
+        for(int j = 0 ;j < G.vexnum;j ++)
+        {
+            if (G.arcs[k][j] < closedge[j].lowcost)
+                closedge[j] = {G.vexs[k],G.arcs[k][j]};
+        }
+        
+    }
+}
+
+int main()
+{
+    cout<<"徐一鸣 202119121612 实验6"<<endl;
+    VerTexType v;
+    AMGraph G;
+    cout << "************算法 6.8 普里姆算法**************" << endl
+         << endl;
+    cout << "从文件中读入无向网 G 数据*****" << endl;
+    CreateUDN(G);
+    cout << endl;
+    cout << "*****无向网 G 创建完成！*****" << endl;
+    //显示邻接矩阵
+    DisplayG(G);
+    cout << endl;
+    cout << "******利用普里姆算法构造最小生成树结果：******" << endl;
+    cout << "请输入初使顶点名\n";
+    cin >> v;
+    MiniSpanTree_Prim(G, v);
+    cout << endl;
+    system("pause");
+    return 0;
+}
